@@ -6,6 +6,7 @@ import pandas as pd
 from streamlit_webrtc import webrtc_streamer
 import av
 from ultralytics import YOLO
+import os
 
 BASE_URL = os.getenv(
     "API_BASE_URL",
