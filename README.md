@@ -1,10 +1,14 @@
 # 🚗 PerceptionOps: End-to-End Traffic Object Detection Platform
 
+## Live Demo
+```
+Streamlit Application: https://your-streamlit-url.up.railway.app
+```
 ![Video Demo](assets/video_tracking.gif)
 
-PerceptionOps is an end-to-end computer vision application for traffic object detection built using YOLOv8. The project started as a model training exercise and gradually evolved into a complete deployment pipeline with a FastAPI backend, Streamlit frontend, Dockerized services, and monitoring through Prometheus and Grafana.
+PerceptionOps is an end-to-end traffic perception platform built using YOLOv8, FastAPI, Streamlit, Docker, Prometheus, and Grafana. What began as a computer vision model training project evolved into a production-style application featuring real-time inference, monitoring, containerized deployment, cloud hosting on Railway, and automated CI/CD workflows through GitHub Actions.
 
-The goal was not only to train an object detection model, but also to understand how a perception model can be served, monitored, and consumed through a user-facing application.
+The project was designed to explore the complete machine learning lifecycle—from dataset validation and model training to API serving, observability, cloud deployment, and user-facing application development. Rather than focusing solely on model performance, the emphasis was placed on building a deployable and maintainable perception system that mirrors real-world machine learning infrastructure.
 
 ---
 
