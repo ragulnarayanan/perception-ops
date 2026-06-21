@@ -294,7 +294,7 @@ Users can:
 
 ---
 
-##  Deployment
+##  Local Deployment
 
 All services run using Docker Compose.
 
@@ -320,6 +320,55 @@ Streamlit:  http://localhost:8501
 FastAPI:    http://localhost:8000/docs
 Prometheus: http://localhost:9090
 Grafana:    http://localhost:3000
+```
+
+---
+
+## Cloud Deployment
+
+PerceptionOps was deployed as a containerized application using Railway, providing public access to both the inference API and user-facing application. The deployment separates the frontend and backend into independent services, enabling scalable inference and simplified maintenance.
+
+Deployment Architecture
+
+```text 
+                    ┌─────────────────────┐
+                    │ Streamlit Frontend  │
+                    │     (Railway)       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  FastAPI Backend    │
+                    │     (Railway)       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   YOLOv8 Model      │
+                    └─────────────────────┘
+```
+
+
+--- 
+
+
+## CI/CD Pipeline
+
+The project uses GitHub-based deployment workflows where code changes are pushed to GitHub and automatically deployed through Railway.
+```text
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions
+    │
+    ▼
+Railway Deployment
+    │
+    ▼
+Production Application
 ```
 
 ---
