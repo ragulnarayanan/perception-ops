@@ -13,8 +13,7 @@ from api.metrics import (
 )
 from PIL import Image
 import tempfile
-from streamlit_webrtc import webrtc_streamer
-import av
+
 
 # ============================================================
 # CONFIG
@@ -219,22 +218,3 @@ def predict_video(video_path):
     return str(latest_video)
 
 
-class VideoProcessor:
-
-    def recv(self, frame):
-
-        img = frame.to_ndarray(
-            format="bgr24"
-        )
-
-        results = model(
-            img,
-            conf=0.4
-        )
-
-        annotated = results[0].plot()
-
-        return av.VideoFrame.from_ndarray(
-            annotated,
-            format="bgr24"
-        )
