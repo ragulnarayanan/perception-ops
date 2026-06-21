@@ -31,8 +31,24 @@ services:
     ports:
       - "3000:3000"
 
+    volumes:
+      - grafana-data:/var/lib/grafana
+
     environment:
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
 
     depends_on:
       - prometheus
+
+  streamlit:
+   build: .
+   command: streamlit run frontend/app.py --server.address 0.0.0.0
+   ports:
+     - "8501:8501"
+   depends_on:
+     - perception-api
+
+volumes:
+  grafana-data:

@@ -3,10 +3,13 @@ import requests
 from PIL import Image
 import io
 import pandas as pd
+from streamlit_webrtc import webrtc_streamer
+import av
+from ultralytics import YOLO
 
-API_URL = "http://localhost:8000/predict"
-IMAGE_API_URL = "http://localhost:8000/predict-image"
-VIDEO_API_URL = "http://localhost:8000/predict-video"
+API_URL = "http://perception-api:8000/predict"
+IMAGE_API_URL = "http://perception-api:8000/predict-image"
+VIDEO_API_URL = "http://perception-api:8000/predict-video"
 
 st.set_page_config(
     page_title="PerceptionOps",
@@ -17,14 +20,36 @@ st.set_page_config(
 st.title("🚗 PerceptionOps")
 st.subheader("Traffic Perception Platform")
 
-tab1, tab2, tab3 = st.tabs(
+tab1, tab2, tab3, tab4 = st.tabs(
     [
         "Image Detection",
         "Video Detection",
+        "Live Camera",
         "Monitoring"
     ]
 )
 
+webcam_model = YOLO("models/best.pt")
+
+class VideoProcessor:
+
+    def recv(self, frame):
+
+        img = frame.to_ndarray(
+            format="bgr24"
+        )
+
+        results = webcam_model(
+            img,
+            conf=0.4
+        )
+
+        annotated = results[0].plot()
+
+        return av.VideoFrame.from_ndarray(
+            annotated,
+            format="bgr24"
+        )
 # =====================================================
 # IMAGE DETECTION
 # =====================================================
@@ -61,10 +86,22 @@ with tab1:
                 IMAGE_API_URL,
                 files=files
             )
+            if (
+                image_response.status_code == 200
+                and image_response.headers.get("content-type", "").startswith("image/")
+            ):
 
-            annotated_image = Image.open(
-                io.BytesIO(image_response.content)
-            )
+                annotated_image = Image.open(
+                    io.BytesIO(image_response.content)
+                )
+
+            else:
+
+                st.error(
+                    f"Image API failed: {image_response.text}"
+                )
+
+                st.stop()
 
         col1, col2 = st.columns(2)
 
@@ -119,10 +156,13 @@ with tab2:
 
     video_file = st.file_uploader(
         "Upload Video",
-        type=["mp4"]
+        type=["mp4"],
+        key="video_upload"
     )
 
     if video_file:
+
+        st.subheader("Input Video")
 
         st.video(video_file)
 
@@ -134,37 +174,68 @@ with tab2:
             )
         }
 
-        if st.button("Run Video Detection"):
+        if st.button(
+            "Run Video Detection"
+        ):
 
-            with st.spinner("Processing Video..."):
+            with st.spinner(
+                "Processing Video..."
+            ):
 
                 response = requests.post(
                     VIDEO_API_URL,
                     files=files
                 )
 
-            st.success("Video Processed")
+            if response.status_code == 200:
 
-            st.video(
-                response.content
-            )
+                output_path = "processed_video.mp4"
 
+                with open(
+                    output_path,
+                    "wb"
+                ) as f:
+                    f.write(response.content)
+
+                st.success(
+                    "Video Processed"
+                )
+
+                st.subheader(
+                    "Processed Video"
+                )
+
+                st.video(
+                    output_path
+                )
+
+            else:
+
+                st.error(
+                    f"Video processing failed: {response.text}"
+                )
+
+
+with tab3:
+
+    st.subheader(
+        "Live Webcam Detection"
+    )
+
+    webrtc_streamer(
+        key="traffic-camera",
+        video_processor_factory=VideoProcessor
+    )
 # =====================================================
 # MONITORING
 # =====================================================
 
-with tab3:
+with tab4:
 
     st.subheader("System Monitoring Dashboard")
 
-    st.markdown(
-        """
-        <iframe
-            src="http://localhost:3000"
-            width="100%"
-            height="900"
-            frameborder="0">
-        </iframe>
-        """,
-        unsafe_allow_html=True
-    )
+    st.components.v1.iframe(
+        "http://localhost:3000/d/adfl4l8/preceptionops?orgId=1&kiosk=true",
+        height=900,
+        scrolling=True
+)

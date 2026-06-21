@@ -73,3 +73,5 @@ pytest_cache/
 *.bak
 
 .dockerignore
+
+.mp4

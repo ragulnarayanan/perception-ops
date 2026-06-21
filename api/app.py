@@ -12,6 +12,7 @@ from fastapi import Response
 from fastapi.responses import FileResponse
 from api.inference import predict_with_image
 from api.inference import predict_video
+from fastapi import HTTPException
 
 app = FastAPI(
     title="PerceptionOps API"
@@ -78,28 +79,39 @@ async def predict_image_visual(
         media_type="image/jpeg"
     )
 
+
 @app.post("/predict-video")
 async def predict_video_endpoint(
     file: UploadFile = File(...)
 ):
+    try:
 
-    with NamedTemporaryFile(
-        delete=False,
-        suffix=".mp4"
-    ) as temp:
+        with NamedTemporaryFile(
+            delete=False,
+            suffix=".mp4"
+        ) as temp:
 
-        temp.write(
-            await file.read()
+            temp.write(
+                await file.read()
+            )
+
+            temp_path = temp.name
+
+        output_video = predict_video(
+            temp_path
         )
 
-        temp_path = temp.name
+        return FileResponse(
+            output_video,
+            media_type="video/mp4",
+            filename="prediction.mp4"
+        )
 
-    output_video = predict_video(
-        temp_path
-    )
+    except Exception as e:
 
-    return FileResponse(
-        output_video,
-        media_type="video/mp4",
-        filename="prediction.mp4"
-    )
+        print("VIDEO ERROR:", str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

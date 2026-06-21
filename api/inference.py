@@ -13,6 +13,8 @@ from api.metrics import (
 )
 from PIL import Image
 import tempfile
+from streamlit_webrtc import webrtc_streamer
+import av
 
 # ============================================================
 # CONFIG
@@ -185,36 +187,54 @@ def predict_with_image(image_path):
 
 def predict_video(video_path):
 
-    model.predict(
+    results = model.predict(
         source=video_path,
         conf=0.4,
         save=True,
         project="runs/detect",
         name="video_predict",
         exist_ok=True,
-        verbose=False
+        verbose=False,
+        stream=True
     )
 
-    output_dir = Path(
-        "runs/detect/video_predict"
-    )
+    for _ in results:
+        pass
 
-    print("Searching:", output_dir)
-
-    video_files = []
-
-    for ext in ["*.mp4", "*.avi", "*.mov", "*.MOV"]:
-        video_files.extend(
-            output_dir.glob(ext)
-        )
-
-    print("Found:")
-    for file in video_files:
-        print(file)
+    video_files = [
+        p for p in Path(".").rglob("*.mp4")
+        if "video_predict" in str(p)
+    ]
 
     if not video_files:
         raise FileNotFoundError(
             "No output video found."
         )
 
-    return str(video_files[0])
+    latest_video = max(
+        video_files,
+        key=lambda x: x.stat().st_mtime
+    )
+
+    return str(latest_video)
+
+
+class VideoProcessor:
+
+    def recv(self, frame):
+
+        img = frame.to_ndarray(
+            format="bgr24"
+        )
+
+        results = model(
+            img,
+            conf=0.4
+        )
+
+        annotated = results[0].plot()
+
+        return av.VideoFrame.from_ndarray(
+            annotated,
+            format="bgr24"
+        )
