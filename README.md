@@ -18,9 +18,6 @@ The goal was not only to train an object detection model, but also to understand
 
 ![Video Detection](assets/video_detection.png)
 
-### Live Camera Detection
-
-![Live Camera](assets/live_camera.png)
 
 ### Monitoring Dashboard
 
