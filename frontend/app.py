@@ -7,9 +7,20 @@ from streamlit_webrtc import webrtc_streamer
 import av
 from ultralytics import YOLO
 
-API_URL = "http://perception-api:8000/predict"
-IMAGE_API_URL = "http://perception-api:8000/predict-image"
-VIDEO_API_URL = "http://perception-api:8000/predict-video"
+BASE_URL = os.getenv(
+    "API_BASE_URL",
+    "http://localhost:8000"
+)
+
+API_URL = f"{BASE_URL}/predict"
+
+IMAGE_API_URL = (
+    f"{BASE_URL}/predict-image"
+)
+
+VIDEO_API_URL = (
+    f"{BASE_URL}/predict-video"
+)
 
 st.set_page_config(
     page_title="PerceptionOps",
