@@ -379,20 +379,6 @@ The final system supports:
 
 ---
 
-## 🚧 Future Improvements
-
-Potential future work includes:
-
-* Vehicle tracking with ByteTrack
-* Lane detection
-* Traffic density estimation
-* Cloud deployment
-* Alerting using Grafana and Prometheus
-* Model versioning and experiment tracking
-* CI/CD pipeline for automated deployment
-
----
-
 ##  Tech Stack
 
 ### Machine Learning
@@ -423,7 +409,7 @@ Potential future work includes:
 
 ---
 
-## 👤 Author
+##  Author
 
 **Ragul Narayanan Magesh**
 
